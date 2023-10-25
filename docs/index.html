@@ -8,7 +8,6 @@
     <link rel="shortcut icon" type="image/ico" href="images/logos/icon.ico" />
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
-    <link rel="stylesheet" href="style.css">
     <script src="https://kit.fontawesome.com/49f46e7382.js" crossorigin="anonymous"></script>
     <script src="video_slider.js"></script>
 </head>
@@ -78,7 +77,7 @@
                 <span class="icon"><i class="ai ai-arxiv"></i></span><span>arXiv</span>
             </a></td>
                     <td> <a href="https://github.com/OllieBoyne/FOUND" class="button is-rounded is-link is-light mr-2">
-                <span class="icon"><i class="fab fa-github"></i></span><span>Code</span>
+                <span class="icon"><i class="fab fa-github"></i></span><span>Code [Coming soon]</span>
             </a></td>
 
                     <td> <a href="google.com" class="button is-rounded is-link is-light mr-2">
@@ -93,20 +92,56 @@
             </table>
         </div>
 
-<!--        HEADLINE-->
+<!--    HEADLINE-->
         <section class="section pt-0">
             <div class="container is-max-desktop">
                 <div class="content has-text-justified-desktop">
                     <ul>
                         <li> We produce a large photorealistic synthetic foot dataset using <a href="http://ollieboyne.github.io/BlenderSynth" class="text-link">BlenderSynth</a>.</li>
                         <li> We train a surface normal predictor on this dataset.</li>
-                        <li> We use surface normals and uncertainty to fit the FIND foot model to multiview images <li
+                        <li> We use surface normals and uncertainty to fit the <a href="http://ollieboyne.github.io/FIND" class="text-link">FIND</a> foot model to multiview images <li
                         <li> We beat SOTA on foot surface normal prediction [] and reconstruction []</li>
                     </ul>
                 </div>
             </div>
         </section>
 
+        <!--    Synthetics-->
+        <section class="section pt-0">
+            <div class="container is-max-desktop">
+                <h1>Synthetic data</h1>
+
+                We create a synthetic dataset, SynFoot, of 50K images of feet, along with surface normals, keypoints and masks.
+
+                These were created using our custom library <a href="http://ollieboyne.github.io/BlenderSynth" class="text-link">BlenderSynth</a>.
+
+                We release these at SynFoot [insert URL]
+
+            </div>
+        </section>
+
+        <!--    Surface normals-->
+        <section class="section pt-0">
+            <div class="container is-max-desktop">
+                <h1>Surface normal prediction</h1>
+
+                We train a surface normal predictor, based on ...
+
+            </div>
+        </section>
+
+
+        <!--    Fitting-->
+        <section class="section pt-0">
+            <div class="container is-max-desktop">
+                <h1>3D Reconstruction</h1>
+
+                We fit the parameters of the FIND model to the surface normals, using the uncertainty to weight the loss function.
+                We do this in a multiview setting, and provide better reconstructions than COLMAP.
+                We can do this accurately with as few as 2 views.
+
+            </div>
+        </section>
 
 
 
@@ -125,7 +160,7 @@
             </div>
 
             <pre>@inproceedings{boyne2023found,
-            title={FOUND: ...},
+            title={FOUND: {F}oot {O}ptimisation with {U}ncertain {N}ormals for Surface {D}eformation using Synthetic Data},
             author={Boyne, Oliver, and Bae, Gwangbin, and Charles, James and Cipolla, Roberto},
             booktitle={Winter Conference on Applications of Computer Vision (WACV)},
             year={2024}
