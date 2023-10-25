@@ -1,1 +1,6 @@
 data
+found_venv
+
+__pycache__
+exp
+.vscode
