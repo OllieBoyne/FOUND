@@ -5,6 +5,7 @@ from collections import namedtuple, defaultdict
 from torch.utils.data import DataLoader
 import torch
 from tqdm import tqdm
+import cv2
 import imageio
 from matplotlib import pyplot as plt
 
@@ -13,7 +14,7 @@ from model import FIND
 from utils import produce_grid, show_kps, show_kp_err, seg_overlap # visualisation tools
 from utils.args import FitArgs, save_args
 from utils import Renderer
-from utils.forward import batch_to_device, calc_losses, LOSS_KEYS, KP_LOSSES
+from utils.forward import batch_to_device, calc_losses, LOSS_KEYS, KP_LOSSES, idx_batch
 from utils.pytorch3d import export_mesh
 
 Stage = namedtuple('Stage', 'name num_epochs lr params losses')
@@ -24,17 +25,17 @@ DEFAULT_STAGES = [
 
 
 
-def visualize_view(GT_data, pred_data, GT_mesh_data=None, norm_err=None):
+def visualize_view(batch, res, GT_mesh_data=None, norm_err=None):
 	"""Visualize a reconstruction view given GT data, predicted data, and optionally GT_mesh data.
 	Each must be in a dictionary of the data for just that view"""
-	pred_kps_np = pred_data['kps'].cpu().detach().numpy()
+	pred_kps_np = res['kps'].cpu().detach().numpy()
 
-	gt_norm_vis =  GT_data['norm_rgb'] * GT_data['sil'].unsqueeze(-1) / 255 #  only consider norm RGB within silhouette for visualisation purposes
+	gt_norm_vis =  batch['norm_rgb'] * batch['sil'].unsqueeze(-1) / 255 #  only consider norm RGB within silhouette for visualisation purposes
 
 	vis_elements = [
-				[GT_data['rgb'], GT_data['sil'], gt_norm_vis, show_kps(GT_data['rgb'], GT_data['kps'])],
-				[pred_data['rgb'], pred_data['sil'], pred_data['norm_rgb'], show_kps(pred_data['rgb'], pred_kps_np, col=(0, 0, 255))],
-				[None, seg_overlap(GT_data['sil'], pred_data['sil']), norm_err, show_kp_err(GT_data['rgb'], GT_data['kps'], pred_kps_np)]
+				[batch['rgb'], batch['sil'], gt_norm_vis, show_kps(batch['rgb'], batch['kps'])],
+				[res['rgb'], res['sil'], res['norm_rgb'], show_kps(res['rgb'], pred_kps_np, col=(0, 0, 255))],
+				[None, seg_overlap(batch['sil'], res['sil']), norm_err, show_kp_err(batch['rgb'], batch['kps'], pred_kps_np)]
 				]
 
 	# if given a GT mesh, render this too.
@@ -52,9 +53,13 @@ def main(args):
 
 	folder_names = dict(rgb=args.rgb_folder, norm=args.norm_folder, norm_unc=args.norm_unc_folder)
 	dataset = FootScanDataset(args.data_folder, targ_img_size=args.targ_img_size, folder_names=folder_names)
-	data_loader = DataLoader(dataset)
+	
+	if args.restrict_num_views is not None:
+		dataset.restrict_views(args.restrict_num_views)
+	
+	data_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, num_workers=4)
 
-	renderer = Renderer(image_size=dataset.img_shape, device=device, max_faces_per_bin=100_000,
+	renderer = Renderer(image_size=args.targ_img_size, device=device, max_faces_per_bin=100_000,
 		     cam_params=dataset.camera_params)
 
 	model = FIND(args.find_pth,
@@ -87,45 +92,66 @@ def main(args):
 			for epoch in tqdm_it:
 				optimiser.zero_grad()
 
-				for batch in data_loader:
+				is_frame_epoch = (epoch % vis_every) == 0 
+				is_last_epoch =  epoch == stage.num_epochs - 1
+				is_vis = is_frame_epoch or is_last_epoch
+
+				epoch_losses = defaultdict(list)
+
+				for nbatch, batch in enumerate(data_loader):
 					batch = batch_to_device(batch, device)
 
+					batch['sil'] = (batch['norm_alpha'] < args.alpha_threshold).float() # create silhouette from uncertainty map
+
 					new_mesh = model()  # get Meshes prediction
-					res = renderer(new_mesh, batch['R'], batch['T'], normals_fmt='XYZ',
-								   render_rgb=False,
-								   render_normals=render_normals,
-								   render_sil=render_sil,
+					res = renderer(new_mesh, batch['R'], batch['T'], normals_fmt='ours',
+								   render_rgb=is_vis,
+								   render_normals=render_normals or is_vis,
+								   render_sil=render_sil or is_vis,
 								   keypoints=model.kps_from_mesh(new_mesh),
 								   mask_out_faces=model.get_mask_out_faces())  # render the mesh
 
 					res['new_mesh'] = new_mesh
 
-					loss_dict = calc_losses(res, batch, stage.losses)
+					loss_dict = calc_losses(res, batch, stage.losses, {'img_size': args.targ_img_size})
 					loss = sum(loss_dict[k] * loss_weights[k] for k in stage.losses)
 
+					for k, v in loss_dict.items(): epoch_losses[k].append(v.item())
+					epoch_avgs = {k: sum(v) / len(v) for k, v in epoch_losses.items()}
+					epoch_avg_loss = sum(epoch_avgs[k] * loss_weights[k] for k in stage.losses)
 
-					tqdm_it.set_description(f'[{stage.name}] LOSS = {loss.item():.4f} | ' + ', '.join(f'{k}: {v * loss_weights[k]:.4f}' for k, v in loss_dict.items()))
+					tqdm_it.set_description(f'[{stage.name}] LOSS = {epoch_avg_loss:.4f} | ' + ', '.join(f'{k}: {v:.4f}' for k, v in epoch_avgs.items()))
 
 					# Store for plotting graph of losses
 					stage_loss_log['loss'].append(loss.item())
 					for k, v in loss_dict.items(): stage_loss_log[k].append(v.item() * loss_weights[k])
 
-					if (epoch % vis_every) == 0:
-						pass # TODO: visualization
+
+					if is_last_epoch:
+						for v in range(len(batch['R'])):
+							view_img = visualize_view(batch=idx_batch(batch, v), res=idx_batch(res, v))
+														# GT_mesh_data=None if gt_mesh_res is None else idx_batch(gt_mesh_res, v))
+							
+							if is_frame_epoch: # save to video
+								pass
+
+							if is_last_epoch: # save to image
+								view_vis_dir = os.path.join(exp_dir, 'views', f'stage_{stage_idx:02d}')
+								os.makedirs(view_vis_dir, exist_ok=True)
+								overall_v = nbatch * args.batch_size + v
+								cv2.imwrite(os.path.join(view_vis_dir, f'view_{overall_v:02d}.png'), cv2.cvtColor(view_img, cv2.COLOR_BGR2RGB))
 
 
-		# STAGE END
-
-		# TODO visualize each view
+		# STAGE END			
 
 		export_mesh(model(), os.path.join(exp_dir, f'fit_{stage_idx:02d}.obj'), False)
 		losses_per_stage.append(stage_loss_log)
 
-	if args.produce_video:
-		fps = 25
-		fname = os.path.join(exp_dir, f'vis.mp4')
-		imageio.mimwrite(fname, frames, fps=fps)
-		print(f"Video written to {fname}")
+	# if args.produce_video:
+		# fps = 25
+		# fname = os.path.join(exp_dir, f'vis.mp4')
+		# imageio.mimwrite(fname, frames, fps=fps)
+		# print(f"Video written to {fname}")
 
 	# Plot graph of optimisation losses
 	fig, axs = plt.subplots(nrows=len(STAGES))
@@ -140,9 +166,7 @@ def main(args):
 	plt.close()
 
 	# save model params
-	if args.model == 'FIND':
-		model.save(os.path.join(exp_dir, 'find_params.json'))
-
+	model.save(os.path.join(exp_dir, 'find_params.json'))
 
 	save_args(args, os.path.join(exp_dir, 'opts.yaml'))
 

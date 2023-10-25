@@ -12,24 +12,19 @@ class FitArgs(argparse.ArgumentParser):
 		self.add_argument('--device', type=str, default='cuda')
 		self.add_argument('--exp_name', default='foot2foot', type=str, help="Experiment name")
 
+		self.add_argument('--alpha_threshold', default=30.0, type=float, help="Alpha threshold for silhouette (degrees)")
+
 		# DATA PARAMS
 		self.add_argument('--data_folder', type=str, default='test_imgs/foot')
-		self.add_argument('--targ_img_size', default=None, type=int,
-							help='Resize images as close to this size(preserving aspect ratio) as possible.')
+		self.add_argument('--targ_img_size', default=(192, 144), type=tuple, help='(H, W) - Resize images to this size.')
 		self.add_argument('--include_gt_mesh', action='store_true', help="Use GT mesh while validating."
 																		"Note: must be in data_folder, as mesh.obj")
 
 		# Folder names - change these if your folder structure is different to the default
 		self.add_argument('--rgb_folder', type=str, default='rgb', help="Name of folder containing RGB images")
-		self.add_argument('--norm_folder', type=str, default='normal', help="Name of folder containing normal predictions")
+		self.add_argument('--norm_folder', type=str, default='norm', help="Name of folder containing normal predictions")
 		self.add_argument('--norm_unc_folder', type=str, default='norm_unc')
 
-		# MODEL PARAMS
-		self.add_argument('--model', type=str, default='FIND', choices=['scan', 'FIND'])
-		self.add_argument('--keypoints_loc', type=str, default='misc/keypoints.csv')
-
-		# scan opts
-		self.add_argument('--scan_loc', default='misc/0015-A.obj')
 
 		# FIND opts
 		self.add_argument('--find_pth', type=str, default='data/find_nfap', help="Path to FIND model directory")
@@ -40,7 +35,7 @@ class FitArgs(argparse.ArgumentParser):
 
 
 		# OPTIM OPTIONS
-		self.add_argument('--views_per_iter', default=10, type=int, help="Sample a smaller number of views per iter to speed up runtime. Set this to None to turn off this feature.")
+		self.add_argument('--batch_size', default=12, type=int)
 		self.add_argument('--restrict_num_views', default=None, type=int, help="Restrict to a fixed number of views. Set this to None to turn off this feature.")
 
 		# OPTIM_WEIGHTS

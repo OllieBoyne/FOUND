@@ -12,6 +12,7 @@ from pytorch3d import ops as p3d_ops
 from pytorch3d.structures import Meshes
 
 nn = torch.nn
+
 class FIND(nn.Module):
 	def __init__(self, find_dir: str, opt_posevec: bool=True, kp_labels: list=None):
 		"""
@@ -35,6 +36,7 @@ class FIND(nn.Module):
 
 		opts = process_opts(opts_loc)
 		opts.load_model = model_loc
+		opts.device = 'cpu' # for compatibility
 		self.model = model_from_opts(opts)
 
 		# define parameters
@@ -43,17 +45,14 @@ class FIND(nn.Module):
 		self.scale = nn.Parameter(torch.tensor([1., 1., 1.], requires_grad=True).unsqueeze(0))
 
 		vec_size = 100 # needs customisation
-		self.shapevec = nn.Parameter \
-			(torch.tensor([0. ] *vec_size, requires_grad=True).unsqueeze(0))
-		self.posevec = nn.Parameter \
-			(torch.tensor([0. ] *vec_size, requires_grad=True).unsqueeze(0))
-		self.texvec = nn.Parameter \
-			(torch.tensor([0. ] *vec_size, requires_grad=True).unsqueeze(0))
+		self.shapevec = nn.Parameter(torch.tensor([0. ] *vec_size, requires_grad=True).unsqueeze(0))
+		self.posevec = nn.Parameter(torch.tensor([0. ] *vec_size, requires_grad=True).unsqueeze(0))
+		self.texvec = nn.Parameter(torch.tensor([0. ] *vec_size, requires_grad=True).unsqueeze(0))
 
-
-		self.params['reg'] = [self.rot, self.trans, self.scale]
-		self.params['deform'] = [self.shapevec]
-		self.params['vertex_deform'] = [self.surface_deforms]
+		self.params = {
+			'reg': [self.rot, self.trans, self.scale],
+			'deform': [self.shapevec],
+		}
 
 		if opt_posevec:
 			self.params['deform'] += [self.posevec]
@@ -77,17 +76,17 @@ class FIND(nn.Module):
 		if masked_faces_loc is not None:
 			self.masked_face_idxs = torch.from_numpy(np.load(masked_faces_loc))
 
-	def __call__(self, ):
+	def to(self, device):
+		self.masked_face_idxs = self.masked_face_idxs.to(device)
+		self.model = self.model.to(device)
+		return super().to(device)
+
+	def forward(self):
 
 		reg = torch.cat([self.trans, self.rot, self.scale], dim=-1)
 
 		meshes = self.model.get_meshes(shapevec=self.shapevec, reg=reg,
 									   texvec=self.texvec, posevec=self.posevec)['meshes']
-
-		# add surface deform
-		if self.surface_deforms is not None:
-			x = torch.tanh(self.surface_deforms) * self.max_surface_deform
-			meshes = meshes.offset_verts(x.unsqueeze(-1) * meshes.verts_normals_packed())
 
 		return meshes
 
@@ -98,6 +97,7 @@ class FIND(nn.Module):
 	def get_params(self, keys):
 		"""Given a list of param groups, return as single list"""
 		return reduce(lambda a,b: a+b, [self.params[k] for k in keys])
+	
 	def get_mask_out_faces(self):
 		"""Return list of faces to mask out"""
 		return self.masked_face_idxs
@@ -106,7 +106,7 @@ class FIND(nn.Module):
 		"""Save current parameters to output loc (as json)"""
 		out = dict(reg = {}, deform = {}, vertex_deform = {})
 		for name, param in self.named_parameters():
-			for k in ['reg', 'deform', 'vertex_deform']:
+			for k in ['reg', 'deform']:
 				if any(param is x for x in self.params[k]):
 					# only works with 1D
 					out[k][name] = [f'{x:.4f}' for x in np.ravel(param.cpu().detach().numpy())]

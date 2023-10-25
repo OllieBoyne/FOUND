@@ -49,12 +49,12 @@ class Normals:
 			# BLENDER: (XYZ) = (right, up, front)
 			normals[..., 0] = -1 * normals[..., 0]
 
-		elif format == 'gwangbin':
-			# Gwanbgin: (XYZ) = (left, up, back)
+		elif format == 'ours':
+			# Our format: (XYZ) = (left, up, back)
 			normals[..., 2] = -1 * normals[..., 2]
 
 		else:
-			raise NotImplementedError
+			raise NotImplementedError(f"Normals format {format} not implemented.")
 
 		rgb = (normals + 1) / 2  # normalize to lie in 0-1 range
 
@@ -73,7 +73,7 @@ class Normals:
 			pass
 		elif format == 'blender':
 			normals[..., 0] = -1 * normals[..., 0]
-		elif format == 'gwangbin':
+		elif format == 'ours':
 			normals[..., 2] = -1 * normals[..., 2]
 		else:
 			raise NotImplementedError
@@ -127,7 +127,7 @@ def normals_from_rgb(rgb: torch.Tensor, mask=None, format='pytorch3d') -> Normal
 		# BLENDER: (XYZ) = (right, up, front)
 		xyz[..., 0] = -1 * xyz[..., 0]
 
-	elif format == 'gwangbin':
+	elif format == 'ours':
 		# Gwanbgin: (XYZ) = (left, up, back)
 		xyz[..., 2] = -1 * xyz[..., 2]
 
@@ -301,27 +301,8 @@ class Renderer(nn.Module):
 		# in the case M = 1, N >= 1, render N views of 1 mesh
 		else:
 			meshes = meshes.extend(N)  # produce a mesh for each view
-
 			out_shape_rgb = (N, *self.image_size, 3)
 			out_shape_single = (N, *self.image_size)
-			batch_size = N
-
-		# handle batching
-		if batch_size > self.MAX_BATCH_SIZE:
-			nbatches = int(np.ceil(N / self.MAX_BATCH_SIZE))
-
-			batch_res = []
-			for nbatch in range(nbatches):
-				start = self.MAX_BATCH_SIZE * nbatch
-				batch_size = min(self.MAX_BATCH_SIZE, N - start)
-				end = start + batch_size
-
-				batch_res.append(self(meshes, R[start:end], T[start:end], keypoints=keypoints,
-									  render_normals=render_normals, render_rgb=render_rgb,
-									  render_sil=render_sil, mask_out_faces=mask_out_faces,
-									  return_cameras=return_cameras, normals_fmt=normals_fmt))
-
-			return {k: torch.cat([r[k] for r in batch_res]) for k in batch_res[0].keys()}
 
 		cameras = PerspectiveCameras(device=meshes.device, R=R, T=T, **camera_params)
 
