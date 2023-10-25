@@ -18,7 +18,7 @@ def idx_batch(batch: dict, idx: int):
 
 def batch_to_device(batch: dict, device: str):
 	"""Return a copy of batch, with all tensors moved to device"""
-	return {k: v.to(device) for k, v in batch.items() if torch.is_tensor(v)}
+	return {k: v if not torch.is_tensor(v) else v.to(device) for k, v in batch.items()}
 
 def calc_losses(res: dict, batch: dict, loss_list: list, aux: dict) -> dict:
 	"""Run forward pass of all losses, return dict of loss values.

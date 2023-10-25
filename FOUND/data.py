@@ -190,6 +190,7 @@ class FootScanDataset(Dataset):
 		kps_unc = kps_var * self.resize_fac ** 2 # resized (sigma_x, sigma_y) ** 2 uncertainties [size K x 2]
 
 		out = {
+			'key': idx,
 			'rgb': rgb,
 			'norm_rgb': norm_rgb,
 			'norm_xyz': norm_xyz,

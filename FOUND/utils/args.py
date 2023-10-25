@@ -10,7 +10,7 @@ class FitArgs(argparse.ArgumentParser):
 		self.add_argument('--cfg', type=str, default=None, help="Path to .yaml file (overrides all other args)")
 
 		self.add_argument('--device', type=str, default='cuda')
-		self.add_argument('--exp_name', default='foot2foot', type=str, help="Experiment name")
+		self.add_argument('--exp_name', default='unnamed', type=str, help="Experiment name")
 
 		self.add_argument('--alpha_threshold', default=30.0, type=float, help="Alpha threshold for silhouette (degrees)")
 
@@ -32,7 +32,7 @@ class FitArgs(argparse.ArgumentParser):
 
 		# VIS PARAMS
 		self.add_argument('--max_views_display', default=3, type=int, help="Maximum views to show in visualizer")
-
+		self.add_argument('--produce_video', action='store_true', help="Produce video of visualizations (slows performance)")
 
 		# OPTIM OPTIONS
 		self.add_argument('--batch_size', default=12, type=int)

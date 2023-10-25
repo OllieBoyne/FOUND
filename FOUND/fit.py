@@ -19,7 +19,7 @@ from utils.pytorch3d import export_mesh
 
 Stage = namedtuple('Stage', 'name num_epochs lr params losses')
 DEFAULT_STAGES = [
-	Stage('Registration', 250, .001, ['reg'], ['kp_nll']),
+	Stage('Registration', 100, .001, ['reg'], ['kp_nll']),
 	Stage('Deform verts', 250, .001, ['deform', 'reg'], ['norm_nll', 'sil', 'norm_nll']),
 ]
 
@@ -57,7 +57,7 @@ def main(args):
 	if args.restrict_num_views is not None:
 		dataset.restrict_views(args.restrict_num_views)
 	
-	data_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, num_workers=4)
+	data_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True)
 
 	renderer = Renderer(image_size=args.targ_img_size, device=device, max_faces_per_bin=100_000,
 		     cam_params=dataset.camera_params)
@@ -71,14 +71,18 @@ def main(args):
 	losses_per_stage = []
 
 	num_epochs = sum(s.num_epochs for s in STAGES)
-	n_frames = min(250, num_epochs)
-	vis_every = num_epochs // n_frames
-	frames = []
+
+	if args.produce_video:
+		n_frames = min(125, num_epochs) # ~5 seconds of video
+		vis_every = num_epochs // n_frames
+
+	else:
+		vis_every = 9999 # never		
+
+	frames = defaultdict(list) # frames per view
 
 	for stage_idx, stage in enumerate(STAGES):
 		optimiser = torch.optim.Adam(model.get_params(stage.params), lr=stage.lr)
-
-
 
 		if len([l for l in stage.losses if l in KP_LOSSES]) > 1:
 			raise ValueError("Only one form of keypoint loss per stage is supported.")
@@ -92,7 +96,7 @@ def main(args):
 			for epoch in tqdm_it:
 				optimiser.zero_grad()
 
-				is_frame_epoch = (epoch % vis_every) == 0 
+				is_frame_epoch = args.produce_video and ((epoch % vis_every) == 0)
 				is_last_epoch =  epoch == stage.num_epochs - 1
 				is_vis = is_frame_epoch or is_last_epoch
 
@@ -116,6 +120,9 @@ def main(args):
 					loss_dict = calc_losses(res, batch, stage.losses, {'img_size': args.targ_img_size})
 					loss = sum(loss_dict[k] * loss_weights[k] for k in stage.losses)
 
+					loss.backward()
+					optimiser.step()
+
 					for k, v in loss_dict.items(): epoch_losses[k].append(v.item())
 					epoch_avgs = {k: sum(v) / len(v) for k, v in epoch_losses.items()}
 					epoch_avg_loss = sum(epoch_avgs[k] * loss_weights[k] for k in stage.losses)
@@ -127,34 +134,30 @@ def main(args):
 					for k, v in loss_dict.items(): stage_loss_log[k].append(v.item() * loss_weights[k])
 
 
-					if is_last_epoch:
+					if is_vis:
 						for v in range(len(batch['R'])):
+							key = batch['key'][v]
+
 							view_img = visualize_view(batch=idx_batch(batch, v), res=idx_batch(res, v))
 														# GT_mesh_data=None if gt_mesh_res is None else idx_batch(gt_mesh_res, v))
 							
 							if is_frame_epoch: # save to video
-								pass
+								frames[key].append(view_img)
 
 							if is_last_epoch: # save to image
 								view_vis_dir = os.path.join(exp_dir, 'views', f'stage_{stage_idx:02d}')
 								os.makedirs(view_vis_dir, exist_ok=True)
-								overall_v = nbatch * args.batch_size + v
-								cv2.imwrite(os.path.join(view_vis_dir, f'view_{overall_v:02d}.png'), cv2.cvtColor(view_img, cv2.COLOR_BGR2RGB))
+								cv2.imwrite(os.path.join(view_vis_dir, f'view_{key}.png'), cv2.cvtColor(view_img, cv2.COLOR_BGR2RGB))
 
 
 		# STAGE END			
-
 		export_mesh(model(), os.path.join(exp_dir, f'fit_{stage_idx:02d}.obj'), False)
 		losses_per_stage.append(stage_loss_log)
 
-	# if args.produce_video:
-		# fps = 25
-		# fname = os.path.join(exp_dir, f'vis.mp4')
-		# imageio.mimwrite(fname, frames, fps=fps)
-		# print(f"Video written to {fname}")
-
 	# Plot graph of optimisation losses
 	fig, axs = plt.subplots(nrows=len(STAGES))
+	if len(STAGES) == 1: axs = [axs]
+
 	for n, stage_loss_info in enumerate(losses_per_stage):
 		ax = axs[n]
 		ax.set_title(STAGES[n].name)
@@ -169,6 +172,15 @@ def main(args):
 	model.save(os.path.join(exp_dir, 'find_params.json'))
 
 	save_args(args, os.path.join(exp_dir, 'opts.yaml'))
+
+	if args.produce_video:
+		fps = 25
+		video_dir = os.path.join(exp_dir, 'videos')
+		os.makedirs(video_dir, exist_ok=True)
+
+		for key, f in frames.items():
+			fname = os.path.join(video_dir, f'{key}.mp4')
+			imageio.mimwrite(fname, f, fps=fps)
 
 if __name__ == '__main__':
 	parser = FitArgs()
