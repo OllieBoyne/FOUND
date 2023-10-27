@@ -174,14 +174,29 @@
 
                 <div class="content has-text-justified-desktop">
 
-                <p>We fit the parameters of the FIND model to the surface normals, using the uncertainty to weight the loss function.</p
-                <p>We do this in a multiview setting, and provide better reconstructions than COLMAP.</p>
-                <p>We can do this accurately with as few as 2 views.</p>
+                <p>We fit the parameters of the FIND model to the surface normals, using the uncertainty to weight the loss function.</p>
+                <p>We do this in a multiview setting, and provide a better reconstructions than COLMAP.</p>
+                <p>We can do this accurately with as few as 2 views, whereas COLMAP needs 15+.</p>
+
 
                 <figure>
                   <img src="images/results/3d-constr-1.png"/>
                   <figcaption><strong>3D reconstruction. Left: A single view of a multi-view reconstruction. Right: Our reconstructed model.</strong></figcaption>
                 </figure>
+
+
+                <figure>
+                  <img src="images/results/3d-table-1.png"/>
+                </figure>
+
+
+                <figure>
+                    <div style="width: 50%;margin-left: auto; margin-right: auto;">
+                    <img src="images/results/num-view-1.png"/>
+                    </div>
+                 <figcaption><strong>Reconstruction results based on number of input views. We show that COLMAP fails with fewer than 15 views, whereas we can handle as few as 2. Also our normal loss, and use of normal uncertainty both increase our reconstruction quality.</strong></figcaption>
+                </figure>
+
 
                 </div>
 
