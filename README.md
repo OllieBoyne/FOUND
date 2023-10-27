@@ -29,7 +29,7 @@ You can also define `--cfg` and link to a `.yaml` file to change the default par
 
 We provide our synthetic foot dataset, [SynFoot](https://github.com/OllieBoyne/SynFoot), which contains 50K synthetic foot scans, with RGB, normals, and masks.
 
-We also provide a benchmark evaluative dataset, [To be added]
+We also provide a benchmark evaluative dataset, [Coming soon]
 
 
 ### Related work
