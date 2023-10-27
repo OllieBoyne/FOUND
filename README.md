@@ -1,8 +1,8 @@
 <p align="center">
-  <img width=70% src="https://ollieboyne.github.io/FOUND/images/logos/found_v1.png">
+  <a href="http://ollieboyne.github.io/FOUND">
+        <img width=70% src="https://ollieboyne.github.io/FOUND/images/logos/found_v1.png">
+  </a>
 </p>
-
-# FOUND
 
 > **FOUND: <ins>F</ins>oot <ins>O</ins>ptimisation with <ins>U</ins>ncertain <ins>N</ins>ormals for Surface <ins>D</ins>eformation using Synthetic Data**  \
 > Winter Conference on Applications of Computer Vision 2024 \
