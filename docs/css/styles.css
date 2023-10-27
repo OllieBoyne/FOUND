@@ -62,3 +62,54 @@ h1 {
     line-height: 1.125;
     margin-bottom: 0.5rem;
 }
+
+#overlay-manager {
+  text-align: center;
+  margin-bottom: 20px;
+
+}
+
+#image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+    margin-left: 3vw;
+}
+
+.image-container {
+  position: relative;
+}
+
+.base, .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.overlay {
+  clip-path: inset(0 100% 0 0);
+}
+
+#toggleButton, #slider, #sliderLabel {
+  margin: 10px;
+  font-size: 16px;
+}
+
+#toggleButton {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#toggleButton:hover {
+  background-color: #0056b3;
+}
+
+.slider-container {
+  display: flex;
+  align-items: center;
+}

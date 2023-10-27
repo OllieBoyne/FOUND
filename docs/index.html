@@ -148,16 +148,28 @@
                 <p>We obtain ground truth normals from our reconstruction dataset, and show that our method significantly outperforms
                 COLMAP, and SOTA normal predictors.</p>
 
+                <figure>
+                    <div id="overlay-manager" style="margin-bottom: 10vh">
+                        <button id="toggleButton">Toggle Overlay</button>
+                        <input type="range" id="slider" min="0" max="100" step="1" value="0">
+
+                        <div id="image-wrapper">
+                          <!-- JavaScript will populate this -->
+                        </div>
+                    </div>
+                    <figcaption><strong>In the wild predictions (use the slider to view)</strong></figcaption>
+                </figure>
+
 
                 <figure>
                   <img src="images/results/normal_prediction_1.png"/>
                   <figcaption><strong>Surface normal prediction, compared with state-of-the-art</strong></figcaption>
                 </figure>
 
-                <figure>
-                  <img src="images/results/in-the-wild-1.png"/>
-                  <figcaption><strong>Surface normal prediction on in-the-wild images</strong></figcaption>
-                </figure>
+<!--                <figure>-->
+<!--                  <img src="images/results/in-the-wild-1.png"/>-->
+<!--                  <figcaption><strong>Surface normal prediction on in-the-wild images</strong></figcaption>-->
+<!--                </figure>-->
 
                     <img src="images/results/normals-table-1.png"/>
 
@@ -237,6 +249,8 @@
             </p>
         </div>
     </footer>
+
+<script src="slider.js"></script>
 </body>
 
 <script>
