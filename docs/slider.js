@@ -6,9 +6,9 @@ document.addEventListener("DOMContentLoaded", function() {
   baseImages.forEach((src, index) => {
     const container = document.createElement('div');
     container.className = 'image-container';
-    container.style.width = '10vw';
-    container.style.height = '9vw'; // width * 3/4
-
+    container.style.width = '20%';
+    container.style.aspectRatio = "3/4";
+    
     const baseImg = new Image();
     baseImg.src = "images/itw/rgb/"+ src;
     baseImg.className = 'base';
