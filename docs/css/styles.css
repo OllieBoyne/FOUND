@@ -63,13 +63,16 @@ h1 {
     margin-bottom: 0.5rem;
 }
 
-#overlay-manager {
+.overlay-manager {
   text-align: center;
   margin-bottom: 20px;
+    display: flex;
+  align-items: center;
+    justify-content: center;
 
 }
 
-#image-wrapper {
+.image-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -91,7 +94,7 @@ h1 {
   clip-path: inset(0 100% 0 0);
 }
 
-#toggleButton, #slider, #sliderLabel {
+#toggleButton, .slider, .sliderLabel {
   margin: 10px;
   font-size: 16px;
 }
@@ -114,15 +117,9 @@ h1 {
   align-items: center;
 }
 
-/* Container for radio buttons and slider */
-#overlay-manager {
-  display: flex;
-  align-items: center;
-justify-content: center;
-}
 
 /* Radio buttons layout */
-#radio-buttons {
+.radio-buttons {
   display: flex;
   align-items: center;
   margin-right: 20px; /* Optional, adds some spacing between radio buttons and slider */

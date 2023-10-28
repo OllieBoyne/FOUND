@@ -121,9 +121,23 @@
                 <p>These were created using our custom library <a href="http://ollieboyne.github.io/BlenderSynth" class="text-link">BlenderSynth</a>,
                 and are <a href="http://github.com/OllieBoyne/SynFoot" class="text-link">available for download</a>.</p>
 
+<!--                <figure>-->
+<!--                  <a href="http://github.com/OllieBoyne/SynFoot"><img src="images/results/synth_samples.png" alt="Samples from our synthetic dataset"/></a>-->
+<!--                  <figcaption><strong>Samples from our synthetic dataset. Left-to-right: RGB, mask, surface normals, keypoints.</strong></figcaption>-->
+<!--                </figure>-->
+
                 <figure>
-                  <a href="http://github.com/OllieBoyne/SynFoot"><img src="images/results/synth_samples.png" alt="Samples from our synthetic dataset"/></a>
-                  <figcaption><strong>Samples from our synthetic dataset. Left-to-right: RGB, mask, surface normals, keypoints.</strong></figcaption>
+                    <div class="overlay-manager">
+                        <div class="radio-buttons" id="radio-buttons-synth">
+                              <!-- JavaScript will populate this -->
+                            </div>
+                        <input type="range" id="slider-synth" min="0" max="100" step="1" value="0">
+
+                    </div>
+                    <div class="image-wrapper" id="image-wrapper-synth">
+                          <!-- JavaScript will populate this -->
+                    </div>
+                    <figcaption><strong>Samples from synthetic dataset (use the slider to view)</strong></figcaption>
                 </figure>
 
                 </div>
@@ -149,14 +163,14 @@
                 COLMAP, and SOTA normal predictors.</p>
 
                 <figure>
-                    <div id="overlay-manager">
-                        <div id="radio-buttons">
+                    <div class="overlay-manager">
+                        <div class="radio-buttons" id="radio-buttons-normals">
                               <!-- JavaScript will populate this -->
                             </div>
-                        <input type="range" id="slider" min="0" max="100" step="1" value="0">
+                        <input type="range" id="slider-normals" min="0" max="100" step="1" value="0">
 
                     </div>
-                    <div id="image-wrapper">
+                    <div class="image-wrapper" id="image-wrapper-normals">
                           <!-- JavaScript will populate this -->
                     </div>
                     <figcaption><strong>In the wild predictions (use the slider to view)</strong></figcaption>
