@@ -154,3 +154,12 @@ input[type="radio"] + label:before {
 input[type="radio"]:checked + label:before {
   background-color: #007bff;
 }
+
+.transition-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;  /* You can adjust the width */
+  background-color: black;
+  pointer-events: none; /* Makes it unclickable and allows events to pass through */
+}

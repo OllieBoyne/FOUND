@@ -31,6 +31,10 @@ document.addEventListener("DOMContentLoaded", function() {
       container.appendChild(overlayImg);
 
     }
+    
+    const transitionLine = document.createElement('div');
+    transitionLine.className = 'transition-line';
+    container.appendChild(transitionLine);
 
     imageWrapper.appendChild(container);
     
@@ -78,5 +82,10 @@ document.querySelectorAll('input[name="overlay"]').forEach((radio) => {
     document.querySelectorAll(`.${currentOverlayClass}`).forEach(el => {
       el.style.clipPath = `inset(0 ${100 - value}% 0 0)`;
     });
+    
+  document.querySelectorAll('.transition-line').forEach(el => {
+    el.style.left = `${value}%`;
+  });
+  
   });
 });
