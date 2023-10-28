@@ -1,6 +1,6 @@
 function createImageSliderSet(options) {
   const {
-    baseDirectory, baseImages, directories, nOverlays, overlayNames,
+    id, baseDirectory, baseImages, directories, nOverlays, overlayNames,
     imageWrapperId, radioButtonsId, sliderId 
   } = options;
 
@@ -24,14 +24,15 @@ function createImageSliderSet(options) {
     for (let i = 0; i < nOverlays; i++) {
       const overlayImg = new Image();
       overlayImg.src = baseDirectory + "/" + directories[i] + '/' + src;
-      overlayImg.className = `overlay overlay${i}`;
+      overlayImg.className = `overlay overlay${i}-${id}`;
       overlayImg.style.display = 'none';
       container.appendChild(overlayImg);
 
     }
     
     const transitionLine = document.createElement('div');
-    transitionLine.className = 'transition-line';
+    transitionLine.className = `transition-line`;
+    transitionLine.id = `transition-line-${id}`;
     container.appendChild(transitionLine);
 
     imageWrapper.appendChild(container);
@@ -43,7 +44,7 @@ function createImageSliderSet(options) {
   for (let i = 0; i < nOverlays; i++) {
   const radioButton = document.createElement('input');
   radioButton.type = 'radio';
-  radioButton.name = 'overlay';
+  radioButton.name = `overlay-${id}`;
   radioButton.value = `overlay${i}`;
   radioButton.id = `${radioButtonsId}${i}`;
   const label = document.createElement('label');
@@ -64,12 +65,12 @@ setTimeout(() => {
   
   const slider = document.getElementById(sliderId);
 
-document.querySelectorAll('input[name="overlay"]').forEach((radio) => {
+document.querySelectorAll(`#${radioButtonsId} input[name="overlay-${id}"]`).forEach((radio) => {
 
   radio.addEventListener('change', function() {
-    document.querySelectorAll(`.${currentOverlayClass}`).forEach(el => el.style.display = 'none');
+    document.querySelectorAll(`.${currentOverlayClass}-${id}`).forEach(el => el.style.display = 'none');
     currentOverlayClass = this.value;
-    document.querySelectorAll(`.${currentOverlayClass}`).forEach(el => {
+    document.querySelectorAll(`.${currentOverlayClass}-${id}`).forEach(el => {
       el.style.display = 'block';
       el.style.clipPath = `inset(0 ${100 - slider.value}% 0 0)`; // Update this line
     });
@@ -78,11 +79,11 @@ document.querySelectorAll('input[name="overlay"]').forEach((radio) => {
 
   slider.addEventListener("input", function(event) {
     const value = event.target.value;
-    document.querySelectorAll(`.${currentOverlayClass}`).forEach(el => {
+    document.querySelectorAll(`.${currentOverlayClass}-${id}`).forEach(el => {
       el.style.clipPath = `inset(0 ${100 - value}% 0 0)`;
     });
     
-  document.querySelectorAll('.transition-line').forEach(el => {
+  document.querySelectorAll(`#transition-line-${id}`).forEach(el => {
     el.style.left = `${value}%`;
   });
   
@@ -93,6 +94,7 @@ document.querySelectorAll('input[name="overlay"]').forEach((radio) => {
 
 document.addEventListener("DOMContentLoaded", function() {
   createImageSliderSet({
+    id:"normals",
     baseDirectory: "images/itw",
     baseImages: ["0.png", "1.png", "2.png", "3.png", "4.png"],
     directories: ["norm", "unc"],
@@ -104,6 +106,7 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   createImageSliderSet({
+    id:"synth",
     baseDirectory: "images/synth",
     baseImages: ["0.png", "1.png", "2.png", "3.png", "4.png"],
     directories: ["mask", "norm", "keypoints"],
