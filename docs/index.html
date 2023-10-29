@@ -97,12 +97,13 @@
 <!--    HEADLINE-->
         <section class="section pt-0">
             <div class="container is-max-desktop">
+                <h1>At a glance</h1>
                 <div class="content has-text-justified-desktop">
                     <ul>
                         <li> We produce a <a href="http://github.com/OllieBoyne/SynFoot" class="text-link">large photorealistic synthetic foot dataset</a> using <a href="http://ollieboyne.github.io/BlenderSynth" class="text-link">BlenderSynth</a>.</li>
                         <li> We train a predictor to predict <a href="https://github.com/baegwangbin/surface_normal_uncertainty" class="text-link">surface normals and uncertainties</a>.</li>
                         <li> We use surface normals and uncertainty to fit the <a href="http://ollieboyne.github.io/FIND" class="text-link">FIND</a> foot model to multiview images </li>
-                        <li> We beat SOTA on foot surface normal prediction and reconstruction.</li>
+                        <li> We beat <a href="https://github.com/baegwangbin/surface_normal_uncertainty" class="text-link">SOTA</a> on foot surface normal prediction, and <a href="https://colmap.github.io" class="text-link">COLMAP</a> on multiview reconstruction, also requiring far fewer views.</li>
                     </ul>
                 </div>
             </div>
@@ -114,7 +115,6 @@
                 <h1>Synthetic data</h1>
 
                 <div class="content has-text-justified-desktop">
-
 
                 <p>We create a synthetic dataset, SynFoot, of 50K images of feet, along with surface normals, keypoints and masks.</p>
 
@@ -160,7 +160,7 @@
                 we find that, with aggressive data augmentation, our normal predictor achieves high quality surface normal predictions on in-the-wild images.</p>
 
                 <p>We obtain ground truth normals from our reconstruction dataset, and show that our method significantly outperforms
-                COLMAP, and SOTA normal predictors.</p>
+                <a href="https://colmap.github.io" class="text-link">COLMAP</a>, and <a href="https://github.com/baegwangbin/surface_normal_uncertainty" class="text-link">SOTA</a> normal predictors.</p>
 
                 <figure>
                     <div class="overlay-manager">
@@ -203,8 +203,8 @@
                 <div class="content has-text-justified-desktop">
 
                 <p>We fit the parameters of the FIND model to the surface normals, using the uncertainty to weight the loss function.</p>
-                <p>We do this in a multiview setting, and provide a better reconstructions than COLMAP, evaluated on our new <a href="https://github.com/OllieBoyne/Foot3D", class="text-link">benchmark foot reconstruction dataset</a>, available for download.</p>
-                <p>We can do this accurately with as few as 2 views, whereas COLMAP needs 15+.</p>
+                <p>We do this in a multiview setting, and produce better reconstructions than <a href="https://colmap.github.io" class="text-link">COLMAP</a>, evaluated on our new <a href="https://github.com/OllieBoyne/Foot3D", class="text-link">benchmark foot reconstruction dataset</a>, available for download.</p>
+                <p>We can do this accurately with as few as 3 views, whereas <a href="https://colmap.github.io" class="text-link">COLMAP</a> needs 15+.</p>
 
 
                 <figure>
@@ -222,7 +222,7 @@
                     <div style="width: 50%;margin-left: auto; margin-right: auto;">
                     <img src="images/results/num-view-1.png"/>
                     </div>
-                 <figcaption><strong>Reconstruction results based on number of input views. We show that COLMAP fails with fewer than 15 views, whereas we can handle as few as 2. Also our normal loss, and use of normal uncertainty both increase our reconstruction quality.</strong></figcaption>
+                 <figcaption><strong>Reconstruction results based on number of input views. We show that COLMAP fails with fewer than 15 views, whereas we can handle as few as 3. Also our normal loss, and use of normal uncertainty both increase our reconstruction quality.</strong></figcaption>
                 </figure>
 
 
