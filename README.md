@@ -7,7 +7,7 @@
 > **FOUND: <ins>F</ins>oot <ins>O</ins>ptimisation with <ins>U</ins>ncertain <ins>N</ins>ormals for Surface <ins>D</ins>eformation using Synthetic Data**  \
 > Winter Conference on Applications of Computer Vision 2024 \
 > [Oliver Boyne](https://ollieboyne.github.io), [Gwangbin Bae](https://www.baegwangbin.com/), [James Charles](http://www.jjcvision.com), and [Roberto Cipolla](https://mi.eng.cam.ac.uk/~cipolla/) \
-> [[arXiv]]() [[project page]](https://ollieboyne.github.io/FOUND/)
+> [[arXiv]](https://arxiv.org/abs/2310.18279) [[project page]](https://ollieboyne.github.io/FOUND/)
 
 
 ## Quickstart
