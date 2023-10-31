@@ -59,3 +59,8 @@ If you use our work, please cite:
             year={2024}
 }
 ```
+
+
+### Troubleshooting
+
+If you have any issues with `trimesh` and `shapely`, see [misc/shapely.md](misc/shapely.md).
