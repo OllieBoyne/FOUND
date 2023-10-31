@@ -46,10 +46,18 @@ class FitArgs(argparse.ArgumentParser):
 			self.add_argument(f'--weight_{k}', default=v, type=float, help=f"Weight for `{k}` loss")
 
 
+		# MISC
+		self.add_argument('--fast', action='store_true', help="Fast mode (for evaluation only)")
+
 	def parse(self, **kwargs):
 		"""Parse command line arguments, overwriting with anything from kwargs"""
 		args = super().parse_args()
+		args.stages = None
+
 		for k, v in kwargs.items():
+			if not hasattr(args, k):
+				raise ValueError(f"Unknown argument {k}")
+			
 			setattr(args, k, v)
 
 		if args.cfg is not None:

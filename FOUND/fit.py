@@ -20,10 +20,9 @@ from utils.pytorch3d import export_mesh
 
 Stage = namedtuple('Stage', 'name num_epochs lr params losses')
 DEFAULT_STAGES = [
-	Stage('Registration', 250, .001, ['reg'], ['kp_nll']),
-	Stage('Deform verts', 1000, .001, ['deform', 'reg'], ['kp_nll', 'sil', 'norm_nll']),
+	Stage('Registration', 50, .001, ['reg'], ['kp_nll']),
+	Stage('Deform verts', 250, .001, ['deform', 'reg'], ['kp_nll', 'sil', 'norm_nll']),
 ]
-
 
 
 def visualize_view(batch, res, GT_mesh_data=None, norm_err=None):
@@ -67,7 +66,7 @@ def main(args):
 				 kp_labels=dataset.kp_labels,
 				 opt_posevec=not args.no_posevec_param).to(device)
 
-	STAGES = getattr(args, 'stages', DEFAULT_STAGES)
+	STAGES = args.stages if args.stages is not None else DEFAULT_STAGES
 	loss_weights = {k: getattr(args, f'weight_{k}') for k in LOSS_KEYS}
 	losses_per_stage = []
 

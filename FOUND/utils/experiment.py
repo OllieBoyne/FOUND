@@ -56,10 +56,11 @@ class Experiment:
 
 class StandardExp(Experiment):
 	def __init__(self, exp_dir='', data_folder:str='', scans: list = [], 
-			  gpus: list = [0]):
+			  gpus: list = [0], **kwargs):
 		super().__init__(exp_dir)
 
 		self.data_folder = data_folder
+		self.kwargs = kwargs
 		self.launch(scans, gpus=gpus)
 
 	def run(self, scan, device='cuda:0'):
@@ -69,7 +70,7 @@ class StandardExp(Experiment):
 		args = parser.parse(exp_name=f'{self.exp_dir}/{exp_name}',
 					  data_folder = os.path.join(self.data_folder, scan),
 					  include_gt_mesh=True,
-					  restrict_num_views=10, # for faster runspeed
+					  **self.kwargs,
 					  device=device)
 		
 		fit_main(args)

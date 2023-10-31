@@ -37,7 +37,7 @@ gpu_indices is a space separated list, e.g. `--gpus 0 1 2 3`
 
 We provide our synthetic foot dataset, [SynFoot](https://github.com/OllieBoyne/SynFoot), which contains 50K synthetic foot scans, with RGB, normals, and masks.
 
-We also provide a benchmark multiview evaluative dataset, [Foot3D](https://github.com/OllieBoyne/Foot3D)
+We also provide a benchmark multiview evaluative dataset, [Foot3D](https://github.com/OllieBoyne/Foot3D).
 
 
 ### Related work
