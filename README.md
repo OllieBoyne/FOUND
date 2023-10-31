@@ -22,20 +22,22 @@
 python FOUND/fit.py --exp_name <exp_name> --data_folder <data_folder>
 ```
 
-You can also define `--cfg` and link to a `.yaml` file to change the default parameters. See `FOUND/utils/args.py` for all arguments.
+You can use `--cfg <file>.yaml` to use a config file to set parameters. See [`args.py`](utils/args.py) for all arguments, and [`example-cfg.yaml`](example-cfg.yaml) for an example config file.
 
 6) Evaluate all of our reconstruction dataset:
 
 ```
-python FOUND/eval.py --data_folder <data_folder> --gpus <space separate list of GPU indices>
+python FOUND/eval.py --data_folder <data_folder> --gpus <gpu_indices>
 ```
+
+gpu_indices is a space separated list, e.g. `--gpus 0 1 2 3`
 
 
 ## Data
 
 We provide our synthetic foot dataset, [SynFoot](https://github.com/OllieBoyne/SynFoot), which contains 50K synthetic foot scans, with RGB, normals, and masks.
 
-We also provide a benchmark evaluative dataset, [Coming soon]
+We also provide a benchmark multiview evaluative dataset, [Foot3D](https://github.com/OllieBoyne/Foot3D)
 
 
 ### Related work
