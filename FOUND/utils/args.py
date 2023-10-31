@@ -78,4 +78,4 @@ def save_args(args: argparse.Namespace, loc: str):
 			args_dict[k] = v
 
 	with open(loc, 'w') as outfile:
-		json.dump(args_dict, outfile)
+		json.dump(args_dict, outfile, indent=4)

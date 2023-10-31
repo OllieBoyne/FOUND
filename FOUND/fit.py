@@ -8,6 +8,7 @@ from tqdm import tqdm
 import cv2
 import imageio
 from matplotlib import pyplot as plt
+import numpy as np
 
 from data import FootScanDataset
 from model import FIND
@@ -19,8 +20,8 @@ from utils.pytorch3d import export_mesh
 
 Stage = namedtuple('Stage', 'name num_epochs lr params losses')
 DEFAULT_STAGES = [
-	Stage('Registration', 100, .001, ['reg'], ['kp_nll']),
-	Stage('Deform verts', 250, .001, ['deform', 'reg'], ['norm_nll', 'sil', 'norm_nll']),
+	Stage('Registration', 250, .001, ['reg'], ['kp_nll']),
+	Stage('Deform verts', 1000, .001, ['deform', 'reg'], ['kp_nll', 'sil', 'norm_nll']),
 ]
 
 
@@ -87,7 +88,7 @@ def main(args):
 		if len([l for l in stage.losses if l in KP_LOSSES]) > 1:
 			raise ValueError("Only one form of keypoint loss per stage is supported.")
 
-		stage_loss_log = defaultdict(list)
+		stage_loss_log = defaultdict(lambda: defaultdict(list))
 
 		render_normals = 'norm_nll' in stage.losses or 'norm_al' in stage.losses
 		render_sil = 'sil' in stage.losses or render_normals
@@ -130,8 +131,8 @@ def main(args):
 					tqdm_it.set_description(f'[{stage.name}] LOSS = {epoch_avg_loss:.4f} | ' + ', '.join(f'{k}: {v:.4f}' for k, v in epoch_avgs.items()))
 
 					# Store for plotting graph of losses
-					stage_loss_log['loss'].append(loss.item())
-					for k, v in loss_dict.items(): stage_loss_log[k].append(v.item() * loss_weights[k])
+					stage_loss_log['loss'][epoch].append(loss.item())
+					for k, v in loss_dict.items(): stage_loss_log[k][epoch].append(v.item() * loss_weights[k])
 
 
 					if is_vis:
@@ -162,7 +163,9 @@ def main(args):
 		ax = axs[n]
 		ax.set_title(STAGES[n].name)
 		for k, v in stage_loss_info.items():
-			ax.plot(v, label=k)
+			epochs = list(v.keys())
+			values = [np.mean(v[e]) for e in epochs]
+			ax.plot(epochs, values, label=k)
 		ax.legend()
 
 	plt.savefig(os.path.join(exp_dir, 'loss_plot.png'), dpi=200)
@@ -171,7 +174,7 @@ def main(args):
 	# save model params
 	model.save(os.path.join(exp_dir, 'find_params.json'))
 
-	save_args(args, os.path.join(exp_dir, 'opts.yaml'))
+	save_args(args, os.path.join(exp_dir, 'opts.json'))
 
 	if args.produce_video:
 		fps = 25

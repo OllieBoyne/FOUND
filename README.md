@@ -15,14 +15,20 @@
 1) `git clone --recurse-submodules http://github.com/OllieBoyne/FOUND`
 2) Install dependencies: `pip install -r requirements.txt`
 3) Download the [pretrained FIND model](https://drive.google.com/drive/folders/1XWmEVo3AdnhJU2fs6igls-emp93beQpm?usp=share_link) to `data/find_nfap`
-4) Download our [benchmark foot dataset]()
-5) Run a foot to a scan:
+4) Download our [benchmark foot dataset](https://github.com/OllieBoyne/Foot3D) to `data/scans`
+5) Fit a single scan:
 
 ```
 python FOUND/fit.py --exp_name <exp_name> --data_folder <data_folder>
 ```
 
 You can also define `--cfg` and link to a `.yaml` file to change the default parameters. See `FOUND/utils/args.py` for all arguments.
+
+6) Evaluate all of our reconstruction dataset:
+
+```
+python FOUND/eval.py --data_folder <data_folder> --gpus <space separate list of GPU indices>
+```
 
 
 ## Data

@@ -137,32 +137,6 @@ def normals_from_rgb(rgb: torch.Tensor, mask=None, format='pytorch3d') -> Normal
 	return Normals(xyz, mask)
 
 
-def sample_points_from_image(image, pts):
-	"""Given an image and a list of points, sample those points from the image
-	:param image: [B x H x W x C] or [B x H x W] image
-	:param pts: [B x N x 2] points
-	:return samples: [B x N x C] sampled points
-	"""
-
-	if image.ndim == 3:
-		image = image.unsqueeze(-1)  # add 'channel' dimension if not existing
-
-	B, H, W, _ = image.shape
-
-	# Convert to [-1, 1] range. (-1, -1) is the top-left corner of the image
-	grid_pts = pts.clone()
-	grid_pts[..., 0] = (grid_pts[..., 0] / (W - 1)) * 2 - 1  # x = 0 -> -1, x = W-1 -> 1 [for align_corners=True]
-	grid_pts[..., 1] = (grid_pts[..., 1] / (H - 1)) * 2 - 1  # y = 0 -> -1, y = H-1 -> 1
-
-	grid_pts = grid_pts.unsqueeze(-2)  # [B x N x 1 x 2]
-
-	# Sample points
-	image = image.permute(0, 3, 1, 2)  # [B x C x H x W]
-	sampled = nn.functional.grid_sample(image, grid_pts, align_corners=True)
-
-	return sampled.squeeze(-1).permute(0, 2, 1)  # [B x N x C]
-
-
 def get_padded_pix_to_face(pix_to_face, meshes):
 	# Need to convert pix_to_face to the face count in the specific mesh
 	# By default, PyTorch3D counts the face indices cumulatively (eg if mesh 1 has F1 faces, the first face in mesh2 is)
