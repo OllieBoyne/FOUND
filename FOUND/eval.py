@@ -32,10 +32,6 @@ if __name__ == "__main__":
     if args.fast:
         kwargs['restrict_num_views'] = 10
 
-        # have to increase epochs somewhat as fewer data points
-        stages[0] = stages[0]._replace(num_epochs = 100)
-        stages[1] = stages[1]._replace(num_epochs = 500)
-
     kwargs['stages'] = stages
 
     StandardExp(exp_dir=args.exp_name, 
