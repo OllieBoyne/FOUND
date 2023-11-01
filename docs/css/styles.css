@@ -159,3 +159,10 @@ input[type="radio"]:checked + label:before {
   background-color: black;
   pointer-events: none; /* Makes it unclickable and allows events to pass through */
 }
+
+/*Mobile*/
+@media only screen and (max-width: 768px) {
+  .radio-buttons {
+    flex-direction: column;
+  }
+}
