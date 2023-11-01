@@ -91,6 +91,38 @@ document.querySelectorAll(`#${radioButtonsId} input[name="overlay-${id}"]`).forE
 
 }
 
+function animateSlider(id){
+  let slider = document.getElementById(id);
+  let duration = 5000; // ms
+  let hold = 3000; // Hold at max
+  let startTime = Date.now();
+  let shouldAnimate = true;
+  function anim() {
+    if (!shouldAnimate) {
+        return;
+    }
+
+    let elapsed = (Date.now() - startTime) % duration;
+    var eitherSide = (duration - hold) / 2
+    slider.value = Math.min(100 * elapsed / eitherSide, 100 * ( - (elapsed - eitherSide - hold)/eitherSide))
+    
+    let event = new Event("input", {
+        'bubbles': true,
+        'cancelable': true
+    });
+    slider.dispatchEvent(event);
+
+    requestAnimationFrame(anim);
+    }
+    
+  slider.addEventListener("mousedown", function() {
+    shouldAnimate =false;
+  });
+    
+  anim()
+  
+}
+
 
 document.addEventListener("DOMContentLoaded", function() {
   createImageSliderSet({
@@ -109,11 +141,15 @@ document.addEventListener("DOMContentLoaded", function() {
     id:"synth",
     baseDirectory: "images/synth",
     baseImages: ["0.png", "1.png", "2.png", "3.png", "4.png"],
-    directories: ["mask", "norm", "keypoints"],
+    directories: ["norm", "mask", "keypoints"],
     nOverlays: 3,
-    overlayNames: ["Mask", "Normals", "Keypoints"],
+    overlayNames: ["Normals", "Mask", "Keypoints"],
     imageWrapperId: "image-wrapper-synth",
     radioButtonsId: "radio-buttons-synth",
     sliderId: "slider-synth"
   });
+  
+  animateSlider("slider-synth")
+  animateSlider("slider-normals")
+  
 });
