@@ -23,8 +23,8 @@ if __name__ == "__main__":
     scans = os.listdir(main_data_folder)
 
     stages = [
-        Stage('Registration', 50, .001, ['reg'], ['kp_nll']),
-        Stage('Deform verts', 250, .001, ['deform', 'reg'], ['kp_nll', 'sil', 'norm_nll']),
+        Stage('Registration', 100, .001, ['reg'], ['kp_nll']),
+        Stage('Deform verts', 500, .001, ['deform', 'reg'], ['kp_nll', 'sil', 'norm_nll']),
     ]
 
     kwargs = {}
