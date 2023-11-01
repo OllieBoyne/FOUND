@@ -166,3 +166,16 @@ input[type="radio"]:checked + label:before {
     flex-direction: column;
   }
 }
+
+/* Make link row into multiple rows*/
+@media (max-width: 767px) {
+  .center td {
+    display: block;
+  }
+  .center tr {
+    display: block;
+  }
+  .center td:not(:last-child) {
+    margin-bottom: .75rem;
+  }
+}
