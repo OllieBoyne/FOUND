@@ -4,11 +4,18 @@
   </a>
 </p>
 
+This repository contains the code for 3D shape fitting to predicted surface normals, as shown in our paper:
+
 > **FOUND: <ins>F</ins>oot <ins>O</ins>ptimisation with <ins>U</ins>ncertain <ins>N</ins>ormals for Surface <ins>D</ins>eformation using Synthetic Data**  \
 > Winter Conference on Applications of Computer Vision 2024 \
 > [Oliver Boyne](https://ollieboyne.github.io), [Gwangbin Bae](https://www.baegwangbin.com/), [James Charles](http://www.jjcvision.com), and [Roberto Cipolla](https://mi.eng.cam.ac.uk/~cipolla/) \
 > [[arXiv]](https://arxiv.org/abs/2310.18279) [[project page]](https://ollieboyne.github.io/FOUND/)
 
+<p align="center">
+  <a href="http://ollieboyne.github.io/FOUND">
+        <img width=90% src="https://ollieboyne.github.io/FOUND/images/itw/sliders.gif">
+  </a>
+</p>
 
 ## Quickstart
 
