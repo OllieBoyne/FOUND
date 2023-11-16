@@ -30,7 +30,7 @@ def visualize_view(batch, res, GT_mesh_data=None, norm_err=None):
 	Each must be in a dictionary of the data for just that view"""
 	pred_kps_np = res['kps'].cpu().detach().numpy()
 
-	gt_norm_vis =  batch['norm_rgb'] * batch['sil'].unsqueeze(-1) / 255 #  only consider norm RGB within silhouette for visualisation purposes
+	gt_norm_vis =  batch['norm_rgb'] * batch['sil'].unsqueeze(-1) #  only consider norm RGB within silhouette for visualisation purposes
 
 	vis_elements = [
 				[batch['rgb'], batch['sil'], gt_norm_vis, show_kps(batch['rgb'], batch['kps'])],
