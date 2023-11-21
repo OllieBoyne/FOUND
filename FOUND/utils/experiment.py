@@ -75,7 +75,7 @@ class StandardExp(Experiment):
 		
 		fit_main(args)
 
-class RestrictumViewsExp(Experiment):
+class RestrictNumViewsExp(Experiment):
 	def __init__(self, exp_dir='', data_folder:str='', scans: list = [], 
 			  num_views: list = (3, 5, 10, 15), gpus: list = [0]):
 		super().__init__(exp_dir)

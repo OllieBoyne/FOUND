@@ -1,15 +1,10 @@
 """Evaluate the performance of a fitted mesh"""
 
-from pytorch3d.io import load_objs_as_meshes
-from pytorch3d.ops import sample_points_from_meshes
-from pytorch3d.loss import chamfer_distance
 from pytorch3d.renderer import TexturesVertex
 from pytorch3d.structures import Meshes
 import os
 import trimesh
 import cv2
-from FIND.src.utils.pytorch3d_tools import to_trimesh
-from find_norm.model.p3d_mod_fun import modified_chamf, modified_sample
 from multiprocessing import Process
 import multiprocessing as mp
 
@@ -18,8 +13,11 @@ import torch
 import torch.nn.functional as F
 
 import numpy as np
-from find_norm.renderer import Renderer, view_from
-from find_norm.model.utils import produce_grid, put_text, colourbar
+
+from .pytorch3d import modified_chamf, modified_sample
+from .renderer import Renderer, view_from
+from .vis import produce_grid, put_text, colourbar
+
 from matplotlib import pyplot as plt
 import json
 

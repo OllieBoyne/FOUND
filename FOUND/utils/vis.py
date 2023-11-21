@@ -114,3 +114,66 @@ def produce_grid(entries):
 				f"Could not combine row {j}, of raw shapes: {[x.shape for x in raw_row]}. Attempted conversion to shapes: {[x.shape for x in row]}")
 
 	return np.vstack(rows)
+
+
+def get_text(string, width, height, backg=(0,0,0), scale=1, linepad=0.2, vertical=False, ):
+	"""Get text width backg coloured background, centered to a rectangle of size width, height.
+	
+	String can be single line, or list of multiple lines"""
+
+	if isinstance(string, str): string = [string]
+
+
+	font = cv2.FONT_HERSHEY_SIMPLEX
+	scale, thick, ltype = scale, 1, 2
+
+	(_, dy), _ = cv2.getTextSize(text=string[0], fontFace=font, fontScale=scale, thickness=thick)
+	dy = int(dy * (1 + linepad))
+
+	# Create a zeros image
+	if vertical: height, width = width, height
+	
+	img = np.zeros((height, width, 3), dtype=np.uint8)
+
+	N = len(string)
+	for n, line in enumerate(string):
+		(w, _), _ = cv2.getTextSize(text=line, fontFace=font, fontScale=scale, thickness=thick)
+		y = int(height//2 + dy//2 + dy * (n - 0.5*(N-1)))#+ dy * (0.5 - (N-n)))
+		x = width//2 - w//2
+		cv2.putText(img, line, (x, y), font, scale, (255, 255, 255), thick, ltype)
+
+	# Rotate the image using cv2.warpAffine()
+	if vertical:
+		return cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+	else:
+		return img
+
+def put_text(img, string, x, y, width, height, backg=(0,0,0), scale=1, vertical=False):
+	"""Place text on an image, with top left corner (x,y), and a given width height.
+	White text, black background fixed.
+	Vertical flag used to rotate 90 degrees anticlockwise"""
+
+	out = img.copy()
+	out[y:y+height, x:x+width] = get_text(string.split('\n'), width, height, scale=scale, backg=backg, vertical=vertical)
+	return out
+
+
+def colourbar(width, height, colours, points=(0, 1), orientation='vertical'):
+	"""Produce a colour bar of size width x height.
+	At each point in `points`, the colour at point along the horizontal/vertical (depending on `orientation`)
+	must be the corresponding colour in `colour`. Between points, linearly interpolate."""
+
+	assert len(colours) == len(points), "Colours to points must be 1-1 correspondence for colourbar"
+	colours = np.array(colours)
+
+	img = np.zeros((height, width, 3))
+	for (c0, p0, c1, p1) in zip(colours, points, colours[1:], points[1:]):
+		if orientation == 'vertical':
+			v0, v1 = int(p0*height), int(p1*height)
+			img[v0: v1] = c0[None, None, :] + np.linspace(0, 1, v1-v0)[:, None, None] * (c1 - c0)[None, None, :]
+
+		else:
+			h0, h1 = int(p0 * width), int(p1 * width)
+			img[:, h0:h1] = c0 + np.linspace(0, 1, h1 - h0) * (c1 - c0)
+
+	return img.astype(np.uint8)
