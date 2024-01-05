@@ -179,3 +179,24 @@ input[type="radio"]:checked + label:before {
     margin-bottom: .75rem;
   }
 }
+
+  .video-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+  }
+
+  .aspect-ratio-16-9 {
+      position: relative;
+      width: 80%; /* Fixed width */
+      padding-top: 45%; /* Aspect ratio 16:9 (9 / 16 * 100%) */
+  }
+
+  .aspect-ratio-16-9 iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+  }
