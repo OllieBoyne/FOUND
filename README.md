@@ -63,7 +63,7 @@ If you use our work, please cite:
 ```
 @inproceedings{boyne2024found,
             title={FOUND: {F}oot {O}ptimisation with {U}ncertain {N}ormals for Surface {D}eformation using Synthetic Data},
-            author={Boyne, Oliver, and Bae, Gwangbin, and Charles, James and Cipolla, Roberto},
+            author={Boyne, Oliver and Bae, Gwangbin and Charles, James and Cipolla, Roberto},
             booktitle={Winter Conference on Applications of Computer Vision (WACV)},
             year={2024}
 }
