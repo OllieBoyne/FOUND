@@ -1,5 +1,5 @@
 data_folder: data/scans/0035
 exp_name: 0035-fit
-restrict_num_views: 10
-batch_size: 10
+restrict_num_views: 5
+batch_size: 5
 produce_video: True
