@@ -78,9 +78,6 @@ class FootScanDataset(Dataset):
             focal_length=f * fac, principal_point=(cx * fac, cy * fac)
         )
 
-        # load GT Mesh
-        # TODO
-
         # load keypoint labels
         kp_loc = os.path.join(src, "keypoints.json")
         if os.path.isfile(kp_loc):
