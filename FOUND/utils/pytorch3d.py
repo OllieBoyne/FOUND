@@ -16,56 +16,78 @@ import sys
 
 F = torch.nn.functional
 
+
 def extend_template(meshes: Meshes, N=1):
-	"""Extend single mesh to multiple meshes """
-	verts = meshes.verts_padded().expand(N, -1, -1).to(meshes.device)
-	faces = meshes.faces_padded().expand(N, -1, -1).to(meshes.device)
+    """Extend single mesh to multiple meshes"""
+    verts = meshes.verts_padded().expand(N, -1, -1).to(meshes.device)
+    faces = meshes.faces_padded().expand(N, -1, -1).to(meshes.device)
 
-	tex = None
-	if meshes.textures is not None:
-		tex = meshes.textures.expand(N, -1, -1)
+    tex = None
+    if meshes.textures is not None:
+        tex = meshes.textures.expand(N, -1, -1)
 
-	return Meshes(verts=verts, faces=faces, textures=tex)
+    return Meshes(verts=verts, faces=faces, textures=tex)
 
-def convert_to_textureVertex(textures_uv: TexturesUV, meshes:Meshes) -> TexturesVertex:
-	verts_colors_packed = torch.zeros_like(meshes.verts_packed())
-	verts_colors_packed[meshes.faces_packed()] = textures_uv.faces_verts_textures_packed()  # (*)
-	return TexturesVertex(packed_to_list(verts_colors_packed, meshes.num_verts_per_mesh()))
+
+def convert_to_textureVertex(textures_uv: TexturesUV, meshes: Meshes) -> TexturesVertex:
+    verts_colors_packed = torch.zeros_like(meshes.verts_packed())
+    verts_colors_packed[
+        meshes.faces_packed()
+    ] = textures_uv.faces_verts_textures_packed()  # (*)
+    return TexturesVertex(
+        packed_to_list(verts_colors_packed, meshes.num_verts_per_mesh())
+    )
 
 
 def to_trimesh(meshes: Meshes, idx=0, include_texture=True):
-	"""Converts meshes to a single trimesh"""
+    """Converts meshes to a single trimesh"""
 
-	verts, faces = meshes.verts_padded().cpu().detach().numpy()[idx], meshes.faces_padded().cpu().detach().numpy()[idx]
+    verts, faces = (
+        meshes.verts_padded().cpu().detach().numpy()[idx],
+        meshes.faces_padded().cpu().detach().numpy()[idx],
+    )
 
-	mesh = trimesh.Trimesh(vertices=verts, faces=faces, process=False)
+    mesh = trimesh.Trimesh(vertices=verts, faces=faces, process=False)
 
-	if include_texture:
-		if isinstance(meshes.textures, TexturesVertex):
-			mesh.visual = trimesh.visual.color.ColorVisuals(vertex_colors = meshes.textures.verts_features_padded().cpu().detach().numpy()[idx])
-		elif isinstance(meshes.textures, TexturesUV):
-			texture = convert_to_textureVertex(meshes.textures, meshes)
-			mesh.visual = trimesh.visual.color.ColorVisuals(vertex_colors = texture.verts_features_padded().cpu().detach().numpy()[idx])
-		else:
-			raise NotImplementedError(f"Cannot export PyTorch3D Mesh to Trimesh with texture type {type(meshes.textures)}")
+    if include_texture:
+        if isinstance(meshes.textures, TexturesVertex):
+            mesh.visual = trimesh.visual.color.ColorVisuals(
+                vertex_colors=meshes.textures.verts_features_padded()
+                .cpu()
+                .detach()
+                .numpy()[idx]
+            )
+        elif isinstance(meshes.textures, TexturesUV):
+            texture = convert_to_textureVertex(meshes.textures, meshes)
+            mesh.visual = trimesh.visual.color.ColorVisuals(
+                vertex_colors=texture.verts_features_padded()
+                .cpu()
+                .detach()
+                .numpy()[idx]
+            )
+        else:
+            raise NotImplementedError(
+                f"Cannot export PyTorch3D Mesh to Trimesh with texture type {type(meshes.textures)}"
+            )
 
-	return mesh
+    return mesh
+
 
 def export_mesh(mesh, export_loc, include_texture=True):
-	"""Render displacement example AND template mesh"""
+    """Render displacement example AND template mesh"""
 
-	mesh = to_trimesh(mesh, include_texture=True)
-	obj_data = trimesh.exchange.obj.export_obj(mesh, include_color=True)
-	with open(export_loc, 'w') as outfile:
-		outfile.write(obj_data)
+    mesh = to_trimesh(mesh, include_texture=True)
+    obj_data = trimesh.exchange.obj.export_obj(mesh, include_color=True)
+    with open(export_loc, "w") as outfile:
+        outfile.write(obj_data)
 
 
-def modified_chamf(x,y, x_lengths=None, y_lengths=None,
-    x_normals=None, y_normals=None,
-    norm: int = 2):
+def modified_chamf(
+    x, y, x_lengths=None, y_lengths=None, x_normals=None, y_normals=None, norm: int = 2
+):
     """
-   	A modified version of pytorch3d.loss.chamfer_distance
-   	to allow for no point or batch reduction and some other changes
+    A modified version of pytorch3d.loss.chamfer_distance
+    to allow for no point or batch reduction and some other changes
     """
 
     if not ((norm == 1) or (norm == 2)):
@@ -95,14 +117,13 @@ def modified_chamf(x,y, x_lengths=None, y_lengths=None,
     x_nn = knn_points(x, y, lengths1=x_lengths, lengths2=y_lengths, norm=norm, K=1)
     y_nn = knn_points(y, x, lengths1=y_lengths, lengths2=x_lengths, norm=norm, K=1)
 
-    cham_x = x_nn.dists[..., 0] ** .5  # (N, P1)
-    cham_y = y_nn.dists[..., 0] ** .5  # (N, P2)
+    cham_x = x_nn.dists[..., 0] ** 0.5  # (N, P1)
+    cham_y = y_nn.dists[..., 0] ** 0.5  # (N, P2)
 
     if is_x_heterogeneous:
         cham_x[x_mask] = 0.0
     if is_y_heterogeneous:
         cham_y[y_mask] = 0.0
-
 
     # Gather the normals using the indices and keep only value for k=0
     x_normals_near = knn_gather(y_normals, x_nn.idx, y_lengths)[..., 0, :]
@@ -115,13 +136,17 @@ def modified_chamf(x,y, x_lengths=None, y_lengths=None,
         F.cosine_similarity(y_normals, y_normals_near, dim=2, eps=1e-6)
     )
 
-    return dict(cham_x=cham_x, cham_y=cham_y, cham_norm_x = cham_norm_x, cham_norm_y=cham_norm_y)
+    return dict(
+        cham_x=cham_x, cham_y=cham_y, cham_norm_x=cham_norm_x, cham_norm_y=cham_norm_y
+    )
 
-def modified_sample(meshes: Meshes,  
+
+def modified_sample(
+    meshes: Meshes,
     num_samples: int = 10000,
     return_normals: bool = False,
-    return_textures: bool = False,):
-
+    return_textures: bool = False,
+):
     """Modified version of pytorch3d.ops.sample_points_from_meshes
     that returns references to the faces sampled from"""
 
@@ -200,11 +225,13 @@ def modified_sample(meshes: Meshes,
 
     out = {}
 
-    out['verts'] = samples
-    if return_normals: out['normals'] = normals
-    if return_textures: out['textures'] = textures
+    out["verts"] = samples
+    if return_normals:
+        out["normals"] = normals
+    if return_textures:
+        out["textures"] = textures
 
     # return original faces
-    out['face_idxs'] = sample_face_idxs
+    out["face_idxs"] = sample_face_idxs
 
     return out

@@ -10,30 +10,40 @@ from argparse import ArgumentParser
 from fit import Stage
 
 parser = ArgumentParser()
-parser.add_argument('--data_folder', type=str, default='data/scans')
-parser.add_argument('--exp_name', type=str, default='exp_on_all')
-parser.add_argument('--fast', action='store_true', help="Reduce number of views for faster fitting (slightly suboptimal results)")
-parser.add_argument('--gpus', nargs='+', type=int, default=[0, 1])
+parser.add_argument("--data_folder", type=str, default="data/scans")
+parser.add_argument("--exp_name", type=str, default="exp_on_all")
+parser.add_argument(
+    "--fast",
+    action="store_true",
+    help="Reduce number of views for faster fitting (slightly suboptimal results)",
+)
+parser.add_argument("--gpus", nargs="+", type=int, default=[0, 1])
 
 if __name__ == "__main__":
-    mp.set_start_method('spawn')
+    mp.set_start_method("spawn")
     args = parser.parse_args()
 
     main_data_folder = args.data_folder
     scans = os.listdir(main_data_folder)
 
     stages = [
-        Stage('Registration', 100, .001, ['reg'], ['kp_nll']),
-        Stage('Deform verts', 500, .001, ['deform', 'reg'], ['kp_nll', 'sil', 'norm_nll']),
+        Stage("Registration", 100, 0.001, ["reg"], ["kp_nll"]),
+        Stage(
+            "Deform verts", 500, 0.001, ["deform", "reg"], ["kp_nll", "sil", "norm_nll"]
+        ),
     ]
 
     kwargs = {}
 
     if args.fast:
-        kwargs['restrict_num_views'] = 10
+        kwargs["restrict_num_views"] = 10
 
-    kwargs['stages'] = stages
+    kwargs["stages"] = stages
 
-    StandardExp(exp_dir=args.exp_name, 
-                data_folder=main_data_folder,
-                scans=scans, gpus=args.gpus, **kwargs)
+    StandardExp(
+        exp_dir=args.exp_name,
+        data_folder=main_data_folder,
+        scans=scans,
+        gpus=args.gpus,
+        **kwargs
+    )
