@@ -200,7 +200,7 @@ def eval_exp(exp_dir, render=True):
 
 	# visualisation info for each metric of error
 	vis_params = {
-		'cham': dict(vmin=0, vmax=1e-4, mag=1_000_000, units='um', cutoffs=np.array([5, 10, 15, 20, 25])*1e-6, xscale='log'),
+		'cham': dict(vmin=0, vmax=1e-4, mag=1_000, units='mm', cutoffs=np.array([5, 10, 15, 20, 25])*1e-3, xscale='log'),
 		'cham_norm': dict(vmin=0, vmax=60, mag=1, units='deg', cutoffs=[5, 7.5, 11.25, 22.5, 30], xscale='lin')
 	}
 
@@ -210,7 +210,7 @@ def eval_exp(exp_dir, render=True):
 	axs[0, 1].set_title('Normal Error')
 	axs[0, 0].set_ylabel('pred2real')
 	axs[1, 0].set_ylabel('real2pred')
-	axs[1, 0].set_xlabel('um')
+	axs[1, 0].set_xlabel('mm')
 	axs[1, 1].set_xlabel('Degrees')
 	axs[1,1].set_xlim(0, 90)
 	axs[1, 1].set_yticks([0, 30, 60, 90])

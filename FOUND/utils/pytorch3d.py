@@ -92,14 +92,11 @@ def modified_chamf(x,y, x_lengths=None, y_lengths=None,
     if y.shape[0] != N or y.shape[2] != D:
         raise ValueError("y does not have the correct shape.")
 
-    cham_norm_x = x.new_zeros(())
-    cham_norm_y = x.new_zeros(())
-
     x_nn = knn_points(x, y, lengths1=x_lengths, lengths2=y_lengths, norm=norm, K=1)
     y_nn = knn_points(y, x, lengths1=y_lengths, lengths2=x_lengths, norm=norm, K=1)
 
-    cham_x = x_nn.dists[..., 0]  # (N, P1)
-    cham_y = y_nn.dists[..., 0]  # (N, P2)
+    cham_x = x_nn.dists[..., 0] ** .5  # (N, P1)
+    cham_y = y_nn.dists[..., 0] ** .5  # (N, P2)
 
     if is_x_heterogeneous:
         cham_x[x_mask] = 0.0
