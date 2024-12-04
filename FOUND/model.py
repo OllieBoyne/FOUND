@@ -6,7 +6,7 @@ import json
 import csv
 import os
 
-from utils.FIND.src.model.model import model_from_opts, process_opts
+from FOUND.utils.FIND.src.model.model import model_from_opts, process_opts
 
 from pytorch3d import ops as p3d_ops
 from pytorch3d.structures import Meshes

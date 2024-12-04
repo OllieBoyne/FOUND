@@ -1,7 +1,7 @@
 from torch.utils.data import Dataset
 import numpy as np
-from utils.normal import kappa_to_alpha_np
-from utils.colmap import load_colmap_data
+from FOUND.utils.normal import kappa_to_alpha_np
+from FOUND.utils.colmap import load_colmap_data
 from pytorch3d.renderer.cameras import get_world_to_view_transform
 import os
 import cv2

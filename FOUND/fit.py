@@ -10,18 +10,18 @@ import imageio
 from matplotlib import pyplot as plt
 import numpy as np
 
-from data import FootScanDataset
-from model import FIND
-from utils import (
+from FOUND.data import FootScanDataset
+from FOUND.model import FIND
+from FOUND.utils import (
     produce_grid,
     show_kps,
     show_kp_err,
     seg_overlap,
 )  # visualisation tools
-from utils.args import FitArgs, save_args
-from utils import Renderer
-from utils.forward import batch_to_device, calc_losses, LOSS_KEYS, KP_LOSSES, idx_batch
-from utils.pytorch3d import export_mesh
+from FOUND.utils.args import FitArgs, save_args
+from FOUND.utils import Renderer
+from FOUND.utils.forward import batch_to_device, calc_losses, LOSS_KEYS, KP_LOSSES, idx_batch
+from FOUND.utils.pytorch3d import export_mesh
 
 Stage = namedtuple("Stage", "name num_epochs lr params losses")
 DEFAULT_STAGES = [

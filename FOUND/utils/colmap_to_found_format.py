@@ -2,7 +2,7 @@
 
 import os
 import argparse
-from utils.colmap_read_write_model import read_model, qvec2rotmat
+from FOUND.utils.colmap_read_write_model import read_model, qvec2rotmat
 import numpy as np
 import json
 

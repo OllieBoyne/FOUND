@@ -5,7 +5,7 @@ Uses multi-threading and multi-gpu"""
 
 import multiprocessing as mp
 import os
-from utils.experiment import StandardExp
+from FOUND.utils.experiment import StandardExp
 from argparse import ArgumentParser
 from fit import Stage
 
