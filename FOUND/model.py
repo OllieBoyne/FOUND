@@ -6,6 +6,8 @@ import json
 import csv
 import os
 
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), "utils", "FIND"))
 from FOUND.utils.FIND.src.model.model import model_from_opts, process_opts
 
 from pytorch3d import ops as p3d_ops
