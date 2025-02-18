@@ -17,6 +17,8 @@ This repository contains the code for 3D shape fitting to predicted surface norm
   </a>
 </p>
 
+**[Feb 2025]** Check out our new work on recovering the FIND model from images using dense correspondences! [[FOCUS]](https://www.ollieboyne.com/FOCUS)
+
 ## Quickstart
 
 1) `git clone --recurse-submodules http://github.com/OllieBoyne/FOUND`
